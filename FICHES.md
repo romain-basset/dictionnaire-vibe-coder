@@ -55,6 +55,16 @@ echo ".env" >> .gitignore           # complète
 
 **Mot à mot.** Première ligne : *affiche le texte `node_modules/`, mais au lieu de l'écrire à l'écran, envoie-le dans `.gitignore`, en remplaçant ce qu'il contenait.* Seconde ligne : *même chose avec `.env`, mais ajoute à la suite au lieu de remplacer.*
 
+**Terme par terme, dans l'ordre de la ligne.**
+
+`echo` ne sait faire qu'une chose : écrire ce qu'on lui donne sur la **sortie standard**, c'est-à-dire l'écran par défaut. Il ne connaît rien aux fichiers.
+
+Le texte entre guillemets est son argument, c'est-à-dire ce qu'il doit écrire. Les guillemets protègent les caractères que le shell interpréterait autrement.
+
+`>` n'appartient pas à `echo` mais au **shell**, qui l'intercepte avant de lancer la commande : il détourne la sortie standard vers un fichier au lieu de l'écran. C'est pourquoi la même écriture fonctionne derrière n'importe quelle commande, pas seulement `echo`.
+
+`.gitignore` est la destination de ce détournement.
+
 Inversés, la première ligne serait perdue.
 
 ## 1.4 Chercher : grep
@@ -64,6 +74,16 @@ grep -ri "erreur" .
 ```
 
 **Mot à mot :** *cherche le motif « erreur », sans distinction de majuscules, en descendant dans tous les sous-dossiers, à partir du dossier où je me trouve.*
+
+**Terme par terme, dans l'ordre de la ligne.**
+
+`grep` lit un contenu ligne par ligne et affiche **les lignes** qui contiennent le motif — pas les mots, pas les fichiers : les lignes entières.
+
+`-ri` est l'écriture compacte de deux flags courts, `-r` et `-i`, réunis derrière un seul tiret. Le shell les sépare pour toi.
+
+`"erreur"` est le **motif** cherché. Les guillemets ne font pas partie du motif : ils empêchent le shell d'interpréter ce qu'il contient, ce qui devient indispensable dès que le motif porte un espace ou un caractère spécial.
+
+`.` est le **point de départ** de la recherche — le dossier courant. Sans `-r`, `grep` n'y verrait qu'un dossier et refuserait de le lire.
 
 | Élément | Rôle |
 |---|---|
@@ -372,7 +392,9 @@ Nuance : `origin/main` étant une référence locale, `git status` dit si **toi*
 
 **`git clone` fait ce travail seul** : il enregistre automatiquement le dépôt cloné sous le nom `origin`. On ne tape `git remote add` que lorsqu'on part d'un dépôt local créé à la main.
 
-**La phrase qui relie tous les termes :** ton dépôt local et son dépôt distant sont deux copies du même historique ; `git remote add origin <url>` enregistre l'adresse du distant sous le nom `origin`, et `git push -u origin main` envoie les commits de ta branche locale `main` vers ce distant, le `-u` mémorisant le lien pour que les prochains `git push` se passent d'arguments.
+### La phrase de synthèse
+
+Ton dépôt local et son dépôt distant sont deux copies du même historique ; `git remote add origin <url>` enregistre l'adresse du distant sous le nom `origin`, et `git push -u origin main` envoie les commits de ta branche locale `main` vers ce distant, le `-u` mémorisant le lien pour que les prochains `git push` se passent d'arguments.
 
 ## 2.15 L'URL d'un dépôt et le suffixe .git
 
@@ -723,10 +745,6 @@ Le chemin n'est jamais vide : `/` est son minimum, et correspond à la page d'ac
 
 ## 3.11 API, endpoint, chemin, route
 
-### La phrase de synthèse
-
-Le **chemin** est ce que le client demande ; la **route** est ce que tu déclares sur ton serveur pour y répondre ; un chemin couvert par une route est un **endpoint** ; et l'ensemble de tes endpoints, avec pour chacun sa méthode et son format de réponse, constitue ton **API**.
-
 ### API
 
 **Application Programming Interface** — l'ensemble des points d'entrée qu'un programme expose pour être utilisé **par un autre programme**.
@@ -773,6 +791,12 @@ Ce qu'un développeur voulant consommer une API doit connaître, en deux volets 
 
 Le format de réponse de `/api/character` est un objet JSON contenant exactement `name`, `birth_year`, `mass` et `height`. C'est ce même besoin qui a obligé à découvrir les noms de champs de SWAPI avant de pouvoir écrire le code.
 
+### La phrase de synthèse
+
+Le client envoie une **requête HTTP** à un **serveur** — une machine, généralement distante — sur lequel tourne un **programme** ; la requête porte un **chemin** (`/api/character`), le programme déclare des **routes** (`app.get('/api/character', fonction)`), et quand le chemin demandé correspond à l'une d'elles, il exécute le code associé et produit la **réponse du serveur** ; les routes destinées à être appelées par un autre programme plutôt que par un navigateur sont ses **endpoints**, et leur ensemble constitue son **API**.
+
+*Deux mots sont bornés à dessein. « Généralement distante » : avec `node app.js` et `localhost:3000`, ta propre machine tient le rôle de serveur sans rien avoir de distant — c'est la preuve que « serveur » désigne un rôle, pas une catégorie de matériel. Et « destinées à être appelées par un autre programme » : un chemin couvert par une route n'est pas pour autant un endpoint, sans quoi tes pages `/` et `/about` en seraient.*
+
 ## 3.12 Site web contre API
 
 Même parcours, même protocole. La seule différence est **ce que le serveur renvoie**, donc côté réponse :
@@ -784,9 +808,13 @@ Même parcours, même protocole. La seule différence est **ce que le serveur re
 
 Vérifié par tes propres commandes : `curl claude.com` renvoie du HTML, `curl api.github.com/users/torvalds` renvoie du JSON. GitHub a séparé les deux par un sous-domaine `api.`.
 
-## 3.13 La phrase de synthèse du trajet complet
+## 3.13 Le trajet complet
 
-Le client envoie une **requête HTTP** à un **serveur** — un ordinateur distant — sur lequel tourne un **programme** ; l'**API** de ce programme est l'ensemble de ses **endpoints**, c'est-à-dire les points d'entrée qu'un autre programme peut appeler, et quand la requête vise l'un d'eux, le programme exécute le code correspondant et produit la **réponse du serveur**.
+### La phrase de synthèse
+
+Quand on tape une URL — protocole, hôte, chemin, query string —, le client envoie une **requête HTTP** à un **serveur**, une machine généralement distante, sur laquelle tourne un **programme**. Ce programme déclare des **routes** ; quand la requête vise l'une d'elles, il exécute le code correspondant et produit la **réponse du serveur**.
+
+C'est le **destinataire** de cette réponse qui qualifie la route. Du **HTML**, que le navigateur décode et met en page pour un humain : la route est alors une **page**. Des données, typiquement du **JSON**, qu'un autre programme traitera : la route est alors un **endpoint**, et l'ensemble des endpoints constitue l'**API** du programme.
 
 ---
 
@@ -828,6 +856,20 @@ curl -X POST https://jsonplaceholder.typicode.com/posts \
 
 **Mot à mot :** *curl, envoie une requête à cette adresse en employant la méthode POST ; ajoute un en-tête annonçant que le corps est du JSON ; et voici ce corps.*
 
+**Terme par terme, dans l'ordre de la ligne.**
+
+`curl` envoie une requête HTTP et écrit la réponse sur la sortie standard. Il ne fait rien d'autre : ni interprétation du HTML, ni exécution de JavaScript, ni mise en page.
+
+`-X POST` impose la **méthode**. Sans lui, `curl` emploie `GET` — le `-X` ne s'écrit donc que lorsqu'on veut autre chose.
+
+L'URL vient ensuite : c'est la destination.
+
+`-H` ajoute **un** en-tête à la requête. Pour en poser plusieurs, on répète le flag autant de fois.
+
+`-d` fournit le **corps** de la requête, ici du JSON. Sa présence suffirait d'ailleurs à faire passer `curl` en `POST` : le `-X POST` est ici explicite, non indispensable.
+
+Le `\` en fin de ligne est une **continuation** : il dit au shell que la commande n'est pas finie, ce qui permet d'aérer une ligne longue sans la casser.
+
 Guillemets **simples** autour du `-d`, pour ne pas entrer en conflit avec les guillemets doubles du JSON.
 
 **Le motif universel de toute API :** tu envoies des données en POST, le serveur crée la ressource, et il renvoie l'objet créé **avec son nouvel identifiant**.
@@ -868,6 +910,14 @@ curl -L "https://api.github.com/repos/facebook/react/issues?state=closed&per_pag
 ```
 
 **Mot à mot :** *curl, va chercher cette adresse, suis les redirections si le serveur en renvoie une, et demande les issues dont l'état est « closed », cinq par page.*
+
+**Terme par terme, dans l'ordre de la ligne.**
+
+`-L` suit les **redirections**. Sans lui, `curl` s'arrête sur la réponse `301` et affiche un corps vide : le serveur a répondu « ce n'est pas ici, va là-bas », et personne n'y est allé.
+
+Les **guillemets doubles** autour de l'URL ne sont pas décoratifs. Sous zsh, le `?` est un joker de noms de fichiers et le `&` lance la commande en arrière-plan : sans guillemets, la commande serait coupée ou refusée. C'est le sujet de la fiche « Les guillemets dans zsh ».
+
+Dans l'URL, `/repos/facebook/react/issues` est le **chemin** — il désigne la ressource — et `?state=closed&per_page=5` la **query string**, qui porte les paramètres optionnels acceptés par ce serveur.
 
 **Et ne jamais présumer des noms de champs.** Deux méthodes fiables pour les connaître : lire le début de la réponse (`| head -40`), ou lire la documentation de l'endpoint.
 
@@ -979,8 +1029,6 @@ C'est pourquoi ton `require('express')` fonctionne sans que tu précises aucun c
 
 **`npx`** exécute un package **sans l'installer durablement** : il le télécharge, le lance, et n'en garde rien dans le projet.
 
-Le critère de choix entre les trois modes est toujours le même : **ton code en a-t-il besoin pour fonctionner ?**
-
 | Commande | Ce qui est installé | Pour quoi |
 |---|---|---|
 | `npm install express` | dans `node_modules`, inscrit dans `package.json` | une **dépendance** de ton code |
@@ -992,6 +1040,10 @@ Express est une dépendance : `app.js` contient `require('express')`, le program
 Deux avantages de `npx` au passage : toujours la dernière version, et un `node_modules` qui ne gonfle pas d'outils étrangers au programme.
 
 **`serve`** est justement un de ces outils : un petit programme serveur autonome, qui expose un dossier par HTTP. L'équivalent de `app.use(express.static('public'))`, sans avoir à écrire de code.
+
+### La phrase de synthèse
+
+Le critère de choix entre les trois modes est toujours le même : **ton code en a-t-il besoin pour fonctionner ?** Oui, c'est une dépendance et elle s'installe dans le projet ; non mais tu t'en sers partout, c'est un outil et il s'installe globalement ; non et tu ne t'en sers qu'une fois, `npx` le lance sans rien laisser derrière lui.
 
 ## 5.10 .gitignore
 
@@ -1043,11 +1095,15 @@ Le cours fait installer `nodemon`, qui date de 2010, bien avant que Node ne sach
 | Inscrit dans `package.json` | oui, dans `dependencies` | **non** |
 | Utilisable | dans ce projet seulement | depuis n'importe quel dossier |
 
-**Le critère :** `-g` pour les **outils en ligne de commande** utilisés partout, sans `-g` pour les **dépendances de ton code**. Express a donc été installé sans `-g` : `app.js` en a besoin pour fonctionner, il doit voyager avec le projet.
-
 **Conséquence :** un package global n'étant pas dans `package.json`, il n'est pas reconstruit par `npm install`. Qui clone ton projet ne l'aura pas.
 
 Même mot et même sens que dans `git config --global` : pour toute la machine, pas seulement ce projet.
+
+### La phrase de synthèse
+
+`-g` s'emploie pour les **outils en ligne de commande** utilisés partout, et jamais pour les **dépendances de ton code**, qui doivent voyager avec le projet.
+
+Le raisonnement complet tient en quatre temps. `app.js` contient `require('express')`, donc le programme ne démarre pas sans Express. Une dépendance doit donc être **reconstructible chez quelqu'un d'autre**. Or `-g` installe le package hors du projet et ne l'inscrit nulle part dans `package.json`. Conclusion : installé globalement, Express serait invisible pour qui clone ton dépôt — un `npm install` ne le ramènerait pas, et le programme refuserait de démarrer chez lui alors qu'il tourne chez toi.
 
 ---
 
