@@ -520,7 +520,12 @@ function ouvrirFiche(fiche, recherche) {
 
   surlignerDansFiche(fiche, recherche);
 
-  fiche.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // On centre sur la première occurrence, et non sur la fiche : une fiche
+  // plus haute que l'écran laisserait sinon le mot cherché hors de vue.
+  // Le repli sur la fiche ne devrait jamais servir, la recherche ayant
+  // trouvé le mot quelque part.
+  const premiere = fiche.element.querySelector('mark') || fiche.element;
+  premiere.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // ------------------------------------------------------------------
