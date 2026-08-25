@@ -22,7 +22,7 @@
   --accent-bordure-survol: rgba(124, 108, 255, 0.38);
   /* Mauve assourdi, pour un texte présent sans être appuyé */
   --accent-tenu: #6e6795;
-  /* Un cran plus clair, quand le champ prend le focus */
+  /* Un cran plus clair : le placeholder de la barre de recherche */
   --accent-doux: #8b83b8;
 
   /* Le stabilo : la seule couleur chaude de la page, pour qu'un mot
@@ -171,11 +171,13 @@ button:active {
    Barre de recherche
    ------------------------------------------------------------------ */
 
-/* position relative sur le conteneur, pour que la croix de nettoyage se
-   place par rapport au champ et non par rapport à la page entière. */
+/* position relative : la zone de suggestions, positionnée en absolu, se
+   place par rapport à ce conteneur et non par rapport à la page entière.
+   Même respiration avant et après : c'est l'élément central de la page,
+   il ne doit pas paraître accroché aux pastilles qui le précèdent. */
 .recherche {
   position: relative;
-  margin-top: 18px;
+  margin-top: 66px;
 }
 
 .recherche-champ {
@@ -193,7 +195,7 @@ button:active {
 }
 
 #champ-recherche::placeholder {
-  color: var(--accent-tenu);
+  color: var(--accent-doux);
 }
 
 #champ-recherche:focus {
@@ -203,7 +205,7 @@ button:active {
 /* Le placeholder s'éclaircit quand le champ prend le focus : la zone
    devient active, son texte d'invite le dit. */
 #champ-recherche:focus::placeholder {
-  color: var(--accent-doux);
+  color: var(--accent-clair);
 }
 
 /* Retire la croix de nettoyage propre à WebKit, qui ignore la palette */
@@ -352,6 +354,18 @@ mark {
   color: var(--stabilo);
   background-color: var(--stabilo-fond);
   border-radius: 2px;
+}
+
+/* Dans du code, le surlignage se fait par la couleur seule. Un fond y
+   dessinerait une boîte à l'intérieur d'une autre — le code inline a déjà
+   la sienne — et la moindre marge disjoindrait le mot du reste, en cassant
+   la grille des caractères en chasse fixe. */
+code mark,
+pre mark {
+  padding: 0;
+  border-radius: 0;
+  background-color: transparent;
+  font-weight: 600;
 }
 
 /* ------------------------------------------------------------------
