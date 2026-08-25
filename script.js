@@ -63,6 +63,22 @@ function decouper(texte) {
     }
   }
 
+  // Le séparateur qui annonce la section suivante a été collecté avec la
+  // dernière fiche de la section précédente, faute de titre pour l'arrêter.
+  // Sans ce nettoyage, chaque fin de section porterait un filet horizontal
+  // qui n'appartient à aucune fiche.
+  for (const section of sections) {
+    for (const fiche of section.fiches) {
+      while (fiche.lignes.length > 0) {
+        const derniere = fiche.lignes[fiche.lignes.length - 1].trim();
+        if (derniere !== '' && derniere !== '---') {
+          break;
+        }
+        fiche.lignes.pop();
+      }
+    }
+  }
+
   return sections.filter((section) => section.fiches.length > 0);
 }
 
@@ -132,6 +148,19 @@ function ouvreUnBloc(ligne) {
     || /^\d+\. /.test(ligne);
 }
 
+// Le titre qui déclenche l'encart de synthèse. Il doit être écrit ainsi,
+// au caractère près, dans FICHES.md.
+const TITRE_SYNTHESE = 'La phrase de synthèse';
+
+// Le caractère U+273B, « teardrop-spoked asterisk ». Écrit sous forme
+// échappée pour qu'aucune manipulation du fichier ne l'abîme. Aucune des
+// deux polices du projet ne le contient : le navigateur ira le chercher
+// dans une police système, donc le rendu peut varier d'une machine à
+// l'autre — c'est le prix de la simplicité face à un tracé SVG.
+const FLEUR = '<span class="fleur">\u273B</span>';
+
+const FLEURONS = '<div class="fleurons">' + FLEUR + FLEUR + FLEUR + '</div>';
+
 function convertir(lignes) {
   const html = [];
   let i = 0;
@@ -141,6 +170,23 @@ function convertir(lignes) {
 
     if (ligne.trim() === '') {
       i++;
+      continue;
+    }
+
+    // La synthèse et tout ce qui la suit jusqu'au prochain sous-titre
+    // forment un encart à part, précédé de son séparateur fleuri.
+    if (ligne.startsWith('### ') && ligne.slice(4).trim() === TITRE_SYNTHESE) {
+      const corps = [];
+      i++;
+      while (i < lignes.length && !lignes[i].startsWith('### ')) {
+        corps.push(lignes[i]);
+        i++;
+      }
+      html.push(FLEURONS);
+      html.push('<aside class="synthese">');
+      html.push('<h3 class="synthese-titre">' + inline(TITRE_SYNTHESE) + '</h3>');
+      html.push(convertir(corps));
+      html.push('</aside>');
       continue;
     }
 

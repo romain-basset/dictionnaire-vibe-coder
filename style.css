@@ -564,6 +564,10 @@ pre mark {
 .fiche-contenu {
   padding: 4px 16px 18px;
   font-size: 14.5px;
+  /* Graisse 300 : l'écart avec le 600 des passages en gras devient net.
+     Il faut charger ce poids dans le lien Google Fonts, sinon le
+     navigateur retombe sur le 400 sans rien signaler. */
+  font-weight: 300;
   color: var(--texte-doux);
 }
 
@@ -666,4 +670,54 @@ pre mark {
 
 .fiche-contenu tbody tr:last-child td {
   border-bottom: none;
+}
+
+/* ------------------------------------------------------------------
+   Encart de synthèse, et son séparateur fleuri
+   ------------------------------------------------------------------ */
+
+/* Trois fleurs centrées : le signal que ce qui suit n'est plus du texte
+   courant. Discrètes au repos, elles s'éclairent quand le regard arrive
+   sur l'encart. */
+.fleurons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 28px 0 14px;
+  color: var(--accent-tenu);
+}
+
+.fleur {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* La barre gauche dit « ce bloc est à part » avec le moins d'encre
+   possible ; le fond à peine teinté le détache sans l'encadrer. */
+.synthese {
+  padding: 16px 18px;
+  background-color: var(--accent-fond);
+  border-left: 2px solid var(--accent-bordure-survol);
+  border-radius: 0 var(--rayon) var(--rayon) 0;
+}
+
+.synthese-titre {
+  margin: 0 0 10px;
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-clair);
+}
+
+/* La formulation à retenir : plus claire que le corps des fiches, qui
+   reste en gris doux. */
+.synthese p {
+  margin: 0;
+  color: var(--texte);
+}
+
+.synthese p + p {
+  margin-top: 12px;
 }
