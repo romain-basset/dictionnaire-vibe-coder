@@ -548,6 +548,15 @@ function rechercher() {
   }
 
   const recherche = normaliser(texte);
+
+  // La fiche ouverte suit ce qui est dans la barre : sans cela, elle
+  // resterait surlignée sur le mot précédent. On capture la référence
+  // avant l'appel, qui commence par effacer et remet la variable à null.
+  const ouverte = ficheSurlignee;
+  if (ouverte) {
+    surlignerDansFiche(ouverte, recherche);
+  }
+
   const trouvees = fiches.filter((fiche) => fiche.carte.normalise.includes(recherche));
 
   suggestions.hidden = false;
