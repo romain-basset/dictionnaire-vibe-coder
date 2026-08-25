@@ -53,6 +53,8 @@ echo "node_modules/" > .gitignore   # crée le fichier
 echo ".env" >> .gitignore           # complète
 ```
 
+**Mot à mot.** Première ligne : *affiche le texte `node_modules/`, mais au lieu de l'écrire à l'écran, envoie-le dans `.gitignore`, en remplaçant ce qu'il contenait.* Seconde ligne : *même chose avec `.env`, mais ajoute à la suite au lieu de remplacer.*
+
 Inversés, la première ligne serait perdue.
 
 ## 1.4 Chercher : grep
@@ -60,6 +62,8 @@ Inversés, la première ligne serait perdue.
 ```bash
 grep -ri "erreur" .
 ```
+
+**Mot à mot :** *cherche le motif « erreur », sans distinction de majuscules, en descendant dans tous les sous-dossiers, à partir du dossier où je me trouve.*
 
 | Élément | Rôle |
 |---|---|
@@ -112,6 +116,8 @@ D'où un usage qui protège plutôt qu'il ne raccourcit :
 ```bash
 git merge feat/recherche && git branch -d feat/recherche
 ```
+
+**Mot à mot :** *verse le travail de `feat/recherche` dans la branche courante, et **seulement si cela s'est bien passé**, supprime cette branche.*
 
 Une fusion qui laisse un conflit sort avec un code non nul : la suppression de la branche n'a alors pas lieu. Le `&&` fait ici office de garde-fou, pas seulement de gain de frappe.
 
@@ -286,6 +292,8 @@ git merge feat/ma-fonctionnalite
 git branch -d feat/ma-fonctionnalite
 ```
 
+**Mot à mot :** *enregistre le travail dans un commit ; bascule sur `main` ; verse-y le travail de la branche ; puis supprime la branche, devenue une référence en double.*
+
 ## 2.11 Dans quel ordre initialiser un projet
 
 **L'ordre entre `git init` et la création du `.gitignore` est indifférent.** Le `.gitignore` n'est qu'un fichier texte, relu par Git à chaque commande ; aucun des deux ne conditionne l'autre.
@@ -323,7 +331,19 @@ git remote add origin https://github.com/romain-basset/exo-starwars.git
 git push -u origin main
 ```
 
-**La phrase qui relie tous les termes :** ton dépôt local et son dépôt distant sont deux copies du même historique ; `git remote add origin <url>` enregistre l'adresse du distant sous le nom `origin`, et `git push -u origin main` envoie les commits de ta branche locale `main` vers ce distant, le `-u` mémorisant le lien pour que les prochains `git push` se passent d'arguments.
+**Mot à mot.** Première ligne : *git, enregistre un dépôt distant, appelle-le `origin`, il se trouve à cette adresse.* Seconde ligne : *git, envoie la branche `main` vers le distant `origin`, et retiens ce lien pour la suite.*
+
+**Terme par terme, dans l'ordre de la ligne.**
+
+`git remote` est la sous-commande qui gère la **liste des dépôts distants** connus de ton dépôt local. Un dépôt distant est simplement un autre dépôt Git, ici hébergé chez GitHub, avec lequel le tien peut échanger des commits.
+
+`add` est l'action : enregistrer un nouveau distant dans cette liste. Il en existe d'autres — `remove`, `rename`, et `-v` pour afficher la liste existante.
+
+`origin` est le **nom court** que tu donnes à ce distant. Ce n'est pas un mot-clé de Git : c'est une convention, tellement répandue qu'elle en a l'air. Tu aurais pu écrire `github` ou `perso`, à condition de reprendre ce nom-là dans tes `git push`.
+
+L'**URL** est l'adresse à laquelle ce nom renvoie.
+
+Sur la seconde ligne, `push` est l'action d'envoyer, `origin` désigne le distant que tu viens d'enregistrer, `main` la branche locale à envoyer, et `-u` mémorise ce couple pour que les fois suivantes se passent d'arguments.
 
 | Élément | Rôle |
 |---|---|
@@ -351,6 +371,8 @@ Mais surtout, ce nom devient un **préfixe de référence**.
 Nuance : `origin/main` étant une référence locale, `git status` dit si **toi** tu as poussé, pas si le distant a bougé depuis. Il n'interroge pas GitHub.
 
 **`git clone` fait ce travail seul** : il enregistre automatiquement le dépôt cloné sous le nom `origin`. On ne tape `git remote add` que lorsqu'on part d'un dépôt local créé à la main.
+
+**La phrase qui relie tous les termes :** ton dépôt local et son dépôt distant sont deux copies du même historique ; `git remote add origin <url>` enregistre l'adresse du distant sous le nom `origin`, et `git push -u origin main` envoie les commits de ta branche locale `main` vers ce distant, le `-u` mémorisant le lien pour que les prochains `git push` se passent d'arguments.
 
 ## 2.15 L'URL d'un dépôt et le suffixe .git
 
@@ -427,6 +449,8 @@ Le `-c` de `git switch -c` signifie **create**. Sans lui, `git switch` refuse un
 git branch feat/recherche
 ```
 
+**Mot à mot :** *crée une branche nommée `feat/recherche`, ici même, et n'y va pas.*
+
 La branche est créée, `HEAD` ne bouge pas. C'est d'ailleurs ce que `git switch -c` fait en interne : `git branch` puis `git switch`.
 
 **Le second argument choisit le point de départ.** Sans lui, la branche naît sur le commit courant. Avec lui, sur celui qu'on désigne :
@@ -434,6 +458,8 @@ La branche est créée, `HEAD` ne bouge pas. C'est d'ailleurs ce que `git switch
 ```bash
 git branch correctif 3ec115b
 ```
+
+**Mot à mot :** *crée une branche nommée `correctif`, positionnée sur le commit `3ec115b`.*
 
 Cohérent avec la définition de la branche : un fichier de 41 octets contenant un hash. Le second argument dit **quel hash y écrire**. Il accepte aussi un nom de branche — `git branch correctif main` part de `main`, même depuis une autre branche. `git switch -c` le prend également.
 
@@ -461,6 +487,8 @@ git branch -d feature/formulaire
 git switch -c feature/categories
 git stash pop
 ```
+
+**Mot à mot :** *range de côté ce qui est en cours ; bascule sur `main` ; verse-y le travail de `feature/formulaire` ; supprime cette branche devenue inutile ; crée `feature/categories` et bascule dessus ; ressors ce qui était rangé.*
 
 Le message `Dropped refs/stash@{0}` confirme que le rangement a été retiré de la pile : le travail n'existe plus qu'à un seul endroit.
 
@@ -491,27 +519,42 @@ Le cycle appliqué à chaque ajout de `bookmark-app` : **une branche, une foncti
 ```bash
 git switch -c feat/recherche
 ```
+*Crée une branche nommée `feat/recherche` et bascule dessus.*
+
 ```bash
 git --no-pager diff
 ```
+*Montre ce qui a changé depuis le dernier commit, d'un seul tenant, sans passer par le pager.*
+
 ```bash
 git add .
 ```
+*Prends tout ce qui a changé dans le dossier courant et ses sous-dossiers, et prépare-le pour le prochain commit.*
+
 ```bash
 git commit -m "feat: recherche de favoris"
 ```
+*Fige ce qui est préparé dans un commit, avec ce message.*
+
 ```bash
 git switch main
 ```
+*Bascule sur la branche `main`.*
+
 ```bash
 git merge feat/recherche
 ```
+*Verse le travail de `feat/recherche` dans la branche où je me trouve.*
+
 ```bash
 git branch -d feat/recherche
 ```
+*Supprime la branche `feat/recherche`, en refusant si son travail n'est pas fusionné.*
+
 ```bash
 git push
 ```
+*Envoie les commits vers le distant mémorisé lors du premier push.*
 
 **Ce que chaque étape achète.** La branche isole le travail en cours : `main` reste à tout moment dans un état qui fonctionne. La relecture du diff avant le commit ne consiste pas à tout comprendre, mais à **vérifier qu'il ne s'y trouve rien qu'on n'ait demandé** — c'est le seul filet quand le code est écrit par un tiers. Le commit fige un état auquel on peut revenir. La fusion verse le travail dans `main`. La suppression de la branche évite qu'une liste de branches mortes ne masque celles qui vivent. Le push publie, et déclenche le déploiement.
 
@@ -783,6 +826,8 @@ curl -X POST https://jsonplaceholder.typicode.com/posts \
   -d '{"userId": 1, "title": "Mon premier post", "body": "Bonjour depuis curl !"}'
 ```
 
+**Mot à mot :** *curl, envoie une requête à cette adresse en employant la méthode POST ; ajoute un en-tête annonçant que le corps est du JSON ; et voici ce corps.*
+
 Guillemets **simples** autour du `-d`, pour ne pas entrer en conflit avec les guillemets doubles du JSON.
 
 **Le motif universel de toute API :** tu envoies des données en POST, le serveur crée la ressource, et il renvoie l'objet créé **avec son nouvel identifiant**.
@@ -821,6 +866,8 @@ devient, pour les 5 issues fermées de `react` chez `facebook` :
 ```bash
 curl -L "https://api.github.com/repos/facebook/react/issues?state=closed&per_page=5"
 ```
+
+**Mot à mot :** *curl, va chercher cette adresse, suis les redirections si le serveur en renvoie une, et demande les issues dont l'état est « closed », cinq par page.*
 
 **Et ne jamais présumer des noms de champs.** Deux méthodes fiables pour les connaître : lire le début de la réponse (`| head -40`), ou lire la documentation de l'endpoint.
 
@@ -981,6 +1028,8 @@ Deux corrections au cours, vérifiées sur ta version (Node 22) :
 ```bash
 node --watch app.js
 ```
+
+**Mot à mot :** *node, exécute `app.js`, et surveille le fichier : à chaque enregistrement, relance-le.*
 
 Le cours fait installer `nodemon`, qui date de 2010, bien avant que Node ne sache le faire. Il reste dans les cours par habitude. Sans `nodemon`, Node lit le fichier une seule fois au démarrage : toute modification exige alors un `Ctrl+C` suivi d'un `node app.js`.
 
