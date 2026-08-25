@@ -1,0 +1,655 @@
+/* ------------------------------------------------------------------
+   Palette et constantes, définies une seule fois.
+   Les variables CSS s'écrivent avec deux tirets et se lisent avec var().
+   ------------------------------------------------------------------ */
+:root {
+  --fond: #0a0a0c;
+  --surface: rgba(255, 255, 255, 0.028);
+  /* Opaque, contrairement aux autres : ce fond passe au-dessus du contenu */
+  --surface-flottante: #141419;
+  --surface-survol: rgba(255, 255, 255, 0.05);
+  --bordure: rgba(255, 255, 255, 0.07);
+  --bordure-vive: rgba(255, 255, 255, 0.14);
+
+  --texte: #ececf1;
+  --texte-doux: #8b8b96;
+  --texte-tenu: #5c5c68;
+
+  --accent-clair: #a99bff;
+  --accent-fond: rgba(124, 108, 255, 0.1);
+  --accent-fond-survol: rgba(124, 108, 255, 0.17);
+  --accent-bordure: rgba(124, 108, 255, 0.22);
+  --accent-bordure-survol: rgba(124, 108, 255, 0.38);
+  /* Mauve assourdi, pour un texte présent sans être appuyé */
+  --accent-tenu: #6e6795;
+  /* Un cran plus clair, quand le champ prend le focus */
+  --accent-doux: #8b83b8;
+
+  /* Le stabilo : la seule couleur chaude de la page, pour qu'un mot
+     trouvé ne puisse pas être confondu avec le mauve de l'interface */
+  --stabilo: #ffb020;
+  --stabilo-fond: rgba(255, 176, 32, 0.16);
+
+  --rayon: 3px;
+  --transition: 160ms cubic-bezier(0.2, 0, 0.2, 1);
+  /* Un déplacement demande plus de temps pour être lu qu'un changement
+     de couleur : d'où une durée distincte pour les formes qui bougent. */
+  --transition-forme: 420ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+/* Remise à zéro minimale : le modèle de boîte inclut bordures et marges
+   intérieures, ce qui rend les tailles prévisibles. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 80px 24px 120px;
+  background-color: var(--fond);
+  color: var(--texte);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+/* ------------------------------------------------------------------
+   En-tête
+   ------------------------------------------------------------------ */
+/* Space Grotesk sur tout l'en-tête. Les pastilles et le champ de recherche
+   la reçoivent par héritage : leur font-family vaut inherit. */
+.entete {
+  margin-bottom: 66px;
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+}
+
+/* Space Grotesk en 700 : géométrique et contemporaine, avec assez de
+   caractère pour porter un titre sans recourir à un effet. La couleur
+   est un gris clair franchement teinté de mauve, en retrait du blanc. */
+h1 {
+  margin: 0;
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  color: #c9c6dc;
+}
+
+/* Les pastilles de catégorie, sous le titre. flex-wrap les fait passer
+   à la ligne quand elles sont trop nombreuses. */
+.compteur {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.pastille {
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--accent-clair);
+  background-color: var(--accent-fond);
+  border: 1px solid var(--accent-bordure);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition),
+              color var(--transition);
+}
+
+.pastille:hover {
+  background-color: var(--accent-fond-survol);
+  border-color: var(--accent-bordure-survol);
+  color: #c0b6ff;
+}
+
+.pastille:active {
+  transform: scale(0.97);
+}
+
+/* ------------------------------------------------------------------
+   Bases communes des champs et des boutons
+   ------------------------------------------------------------------ */
+input {
+  padding: 11px 13px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--texte);
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--bordure);
+  border-radius: 3px;
+  outline: none;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+input::placeholder {
+  color: var(--texte-tenu);
+}
+
+input:focus {
+  border-color: var(--bordure-vive);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+button {
+  padding: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent-clair);
+  background-color: var(--accent-fond);
+  border: 1px solid var(--accent-bordure);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition),
+              color var(--transition), transform var(--transition);
+}
+
+button:hover {
+  background-color: var(--accent-fond-survol);
+  border-color: var(--accent-bordure-survol);
+  color: #c0b6ff;
+}
+
+/* Un enfoncement discret au clic : la réponse tactile qui manque au web */
+button:active {
+  transform: scale(0.985);
+}
+
+/* ------------------------------------------------------------------
+   Barre de recherche
+   ------------------------------------------------------------------ */
+
+/* position relative sur le conteneur, pour que la croix de nettoyage se
+   place par rapport au champ et non par rapport à la page entière. */
+.recherche {
+  position: relative;
+  margin-top: 18px;
+}
+
+.recherche-champ {
+  position: relative;
+}
+
+/* Bordure d'accent : c'est la seule zone active de la page, elle doit se
+   désigner comme telle. La marge intérieure droite réserve la place de la
+   croix, pour que le texte ne passe pas dessous. */
+#champ-recherche {
+  display: block;
+  width: 100%;
+  padding-right: 38px;
+  border-color: var(--accent-bordure);
+}
+
+#champ-recherche::placeholder {
+  color: var(--accent-tenu);
+}
+
+#champ-recherche:focus {
+  border-color: var(--accent-bordure-survol);
+}
+
+/* Le placeholder s'éclaircit quand le champ prend le focus : la zone
+   devient active, son texte d'invite le dit. */
+#champ-recherche:focus::placeholder {
+  color: var(--accent-doux);
+}
+
+/* Retire la croix de nettoyage propre à WebKit, qui ignore la palette */
+#champ-recherche::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+/* La croix de nettoyage, centrée verticalement dans le champ : le haut du
+   bouton est descendu à la moitié de la hauteur, puis remonté de la moitié
+   de sa propre hauteur par translateY. */
+.vider {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--accent-tenu);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+/* Le display flex ci-dessus annulerait l'attribut hidden, qui n'est
+   lui-même qu'un display: none posé par le navigateur. */
+.vider[hidden] {
+  display: none;
+}
+
+.vider:hover {
+  color: var(--accent-clair);
+  background-color: var(--accent-fond);
+  border-color: var(--accent-bordure);
+}
+
+/* transform ne s'additionne pas d'une règle à l'autre : le scale de la
+   règle button:active écraserait le centrage. On le réécrit donc ici. */
+.vider:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+/* ------------------------------------------------------------------
+   Zone de suggestions
+   ------------------------------------------------------------------ */
+
+/* La zone flotte au-dessus de la table des matières plutôt que de la
+   repousser : la page ne saute pas quand les résultats apparaissent. */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+
+  max-height: 60vh;
+  overflow-y: auto;
+
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  background-color: var(--surface-flottante);
+  border: 1px solid var(--bordure-vive);
+  border-radius: var(--rayon);
+}
+
+/* Le display ci-dessus annulerait l'attribut hidden, qui n'est lui-même
+   qu'un display: none posé par le navigateur. */
+.suggestions[hidden] {
+  display: none;
+}
+
+/* Un bouton et non un lien : le clic ne navigue pas, il déplie une fiche
+   déjà présente dans la page. Les règles génériques de button sont donc
+   presque toutes annulées ici. */
+.suggestion {
+  display: block;
+  width: 100%;
+  padding: 11px 13px;
+  text-align: left;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--texte-doux);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rayon);
+}
+
+.suggestion:hover {
+  color: var(--texte-doux);
+  background-color: var(--surface-survol);
+  border-color: var(--bordure);
+}
+
+.suggestion:active {
+  transform: none;
+}
+
+/* Le chemin en exergue : la section, puis la fiche */
+.suggestion-chemin {
+  display: block;
+  margin-bottom: 5px;
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--accent-clair);
+}
+
+/* Quatre lignes au plus, coupées proprement par le navigateur */
+.suggestion-extrait {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.suggestion-vide {
+  padding: 14px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--texte-tenu);
+}
+
+/* ------------------------------------------------------------------
+   Surlignage des occurrences
+   ------------------------------------------------------------------ */
+
+/* mark est l'élément prévu pour ça : le navigateur lui donne par défaut
+   un fond jaune et un texte noir, qu'on remplace par notre teinte. */
+mark {
+  padding: 0 1px;
+  color: var(--stabilo);
+  background-color: var(--stabilo-fond);
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------------
+   Ligne d'état, sous la barre de recherche
+   ------------------------------------------------------------------ */
+.etat {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  color: var(--texte-tenu);
+}
+
+/* ------------------------------------------------------------------
+   Sections, reprises telles quelles des dossiers de bookmark-app
+   ------------------------------------------------------------------ */
+.dossiers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dossier {
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background-color: rgba(255, 255, 255, 0.015);
+  overflow: hidden;
+}
+
+/* summary est la partie cliquable, toujours visible. On retire le triangle
+   par défaut du navigateur pour poser notre propre chevron. */
+.dossier-entete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background-color var(--transition);
+}
+
+.dossier-entete::-webkit-details-marker {
+  display: none;
+}
+
+.dossier-entete:hover {
+  background-color: var(--surface-survol);
+}
+
+/* Le chevron, dessiné en pur CSS : deux bordures d'un carré vide,
+   pivotées de 45 degrés. Il tourne quand la section s'ouvre. */
+.dossier-entete::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-right: 1.5px solid var(--texte-doux);
+  border-bottom: 1.5px solid var(--texte-doux);
+  transform: rotate(-45deg);
+  transition: transform var(--transition);
+}
+
+.dossier[open] > .dossier-entete::before {
+  transform: rotate(45deg);
+}
+
+/* Space Grotesk, comme l'en-tête : la section est la voix de la structure,
+   les fiches restent en Outfit, la police du texte courant. */
+.dossier-nom {
+  flex: 1;
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #c9c6dc;
+}
+
+/* Le nombre de fiches de la section, dans la teinte d'accent */
+.dossier-tag {
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent-clair);
+  background-color: var(--accent-fond);
+  border: 1px solid var(--accent-bordure);
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------------
+   Fiches, à l'intérieur d'une section
+   ------------------------------------------------------------------ */
+/* La marge intérieure gauche décale la colonne entière, pas seulement le
+   texte : c'est le décrochement qui rend la subordination lisible. */
+.fiches-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 10px 10px 26px;
+}
+
+.fiche {
+  background-color: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+
+.fiche[open] {
+  border-color: var(--accent-bordure);
+}
+
+/* position relative : les deux chevrons sont placés en absolu par rapport
+   à cette entête, faute de pouvoir loger deux pseudo-éléments en tête du
+   flux. La marge intérieure gauche leur réserve la place. */
+.fiche-entete {
+  position: relative;
+  padding: 10px 14px 10px 32px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--texte-doux);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.fiche-entete::-webkit-details-marker {
+  display: none;
+}
+
+/* Double chevron : le nombre de signes dit la profondeur, comme dans un
+   fil de discussion. Plus petits et plus sourds que celui des sections. */
+/* Les quatre bordures sont déclarées d'emblée, les deux du haut et de
+   gauche à une largeur nulle : c'est ce qui permet de les faire naître à
+   l'ouverture, et de les animer. */
+.fiche-entete::before,
+.fiche-entete::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border: 0 solid var(--texte-tenu);
+  border-right-width: 1.5px;
+  border-bottom-width: 1.5px;
+  transform: translateY(-50%) rotate(-45deg);
+  transition: transform var(--transition-forme),
+              border-width var(--transition-forme),
+              opacity var(--transition-forme),
+              border-color var(--transition);
+}
+
+.fiche-entete::before {
+  left: 13px;
+}
+
+.fiche-entete::after {
+  left: 19px;
+}
+
+/* À l'ouverture, le premier chevron parcourt les 6px qui le séparent du
+   second et pivote d'un demi-tour : ses deux bordures deviennent les deux
+   côtés qui manquaient au second. Les quatre côtés réunis forment un
+   losange, à cheval sur les deux formes.
+   Choix assumé : les côtés paraissent légèrement creusés, parce que les
+   traits de deux formes distinctes se rejoignent au lieu de se prolonger.
+   Une forme unique portant quatre bordures serait plus nette, mais perdrait
+   ce mouvement-là. */
+.fiche[open] > .fiche-entete::before {
+  transform: translateY(-50%) translateX(6px) rotate(135deg);
+  border-color: var(--accent-clair);
+}
+
+.fiche[open] > .fiche-entete::after {
+  border-color: var(--accent-clair);
+}
+
+.fiche-entete:hover {
+  background-color: var(--surface-survol);
+  color: var(--texte);
+}
+
+.fiche-entete:hover::before,
+.fiche-entete:hover::after {
+  border-color: var(--texte-doux);
+}
+
+.fiche[open] > .fiche-entete {
+  color: var(--accent-clair);
+  border-bottom: 1px solid var(--bordure);
+}
+
+/* ------------------------------------------------------------------
+   Contenu d'une fiche : le Markdown converti
+   ------------------------------------------------------------------ */
+.fiche-contenu {
+  padding: 4px 16px 18px;
+  font-size: 14.5px;
+  color: var(--texte-doux);
+}
+
+.fiche-contenu p {
+  margin: 14px 0;
+}
+
+.fiche-contenu strong {
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.fiche-contenu h3 {
+  margin: 22px 0 10px;
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #c9c6dc;
+}
+
+.fiche-contenu ul,
+.fiche-contenu ol {
+  margin: 14px 0;
+  padding-left: 22px;
+}
+
+.fiche-contenu li {
+  margin: 5px 0;
+}
+
+.fiche-contenu hr {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid var(--bordure);
+}
+
+/* Le code inline se distingue par un fond, pas par une bordure : dans un
+   paragraphe, une bordure alourdirait la ligne. */
+.fiche-contenu code {
+  padding: 1.5px 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+  color: var(--accent-clair);
+  background-color: var(--accent-fond);
+  border-radius: 3px;
+}
+
+.fiche-contenu pre {
+  margin: 14px 0;
+  padding: 13px 15px;
+  overflow-x: auto;
+  background-color: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+}
+
+/* Dans un bloc, le fond et la couleur d'accent du code inline seraient
+   redondants : le bloc porte déjà sa propre surface. */
+.fiche-contenu pre code {
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--texte);
+  background-color: transparent;
+}
+
+/* ------------------------------------------------------------------
+   Tableaux
+   ------------------------------------------------------------------ */
+
+/* Le conteneur défile horizontalement plutôt que de déborder de la page :
+   certains tableaux ont quatre colonnes de texte. */
+.tableau {
+  margin: 14px 0;
+  overflow-x: auto;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+}
+
+.fiche-contenu table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.fiche-contenu th {
+  padding: 9px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--texte);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--bordure);
+}
+
+.fiche-contenu td {
+  padding: 9px 12px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--bordure);
+}
+
+.fiche-contenu tbody tr:last-child td {
+  border-bottom: none;
+}

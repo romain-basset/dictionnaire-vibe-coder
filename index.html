@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dictionnaire du vibe coder</title>
+
+  <!-- Polices Outfit et Space Grotesk, chargées depuis Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main>
+
+    <header class="entete">
+      <h1>Dictionnaire du vibe coder</h1>
+
+      <!-- Les pastilles de section sont construites par script.js -->
+      <div class="compteur" id="compteur"></div>
+
+      <div class="recherche">
+
+        <div class="recherche-champ">
+          <input type="search" id="champ-recherche" placeholder="Rechercher une notion, une commande, un mot" autocomplete="off">
+          <button type="button" id="vider-recherche" class="vider" aria-label="Vider la recherche" hidden>×</button>
+        </div>
+
+        <!-- hidden masque la zone tant qu'aucune lettre n'est tapée -->
+        <ul id="suggestions" class="suggestions" hidden></ul>
+
+      </div>
+
+      <!-- Ne parle que pendant une recherche, ou si le fichier est illisible -->
+      <p class="etat" id="etat" hidden></p>
+    </header>
+
+    <!-- Les sections et les fiches sont construites par script.js -->
+    <div id="fiches" class="dossiers"></div>
+
+  </main>
+
+  <!-- Le script est en fin de body pour que les éléments ci-dessus existent
+       déjà quand il s'exécute -->
+  <script src="script.js"></script>
+
+</body>
+</html>
