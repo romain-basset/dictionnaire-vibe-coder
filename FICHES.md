@@ -40,11 +40,26 @@ Un fichier caché n'est pas protégé, seulement discret. C'est la convention po
 
 `tail` est la commande des fichiers de journal : quand un programme échoue, l'erreur est à la fin.
 
+**Ce que fait `cat`, exactement.** Son nom abrège *concatenate* : il lit une ou plusieurs sources et écrit le résultat sur sa **sortie standard**, l'écran par défaut. Quand tu tapes `cat CLAUDE.md`, la source est le fichier et la sortie ton terminal — d'où le contenu qui s'affiche. C'est l'usage courant, mais ce n'est qu'un cas particulier : `cat` ne sait pas qu'il « affiche », il écrit sur un canal dont il ignore la destination. Rebranche ce canal, et le même `cat` remplit un fichier.
+
 ## 1.3 Écrire dans un fichier
 
-`>` **écrase** tout le contenu existant. `>>` **ajoute** à la fin. Les deux **créent** le fichier s'il n'existe pas — la différence n'apparaît que s'il existe déjà.
+**`>` ne fait qu'une seule chose : rediriger la sortie d'une commande vers un fichier.** L'écrasement n'est pas une seconde fonction qui s'y ajouterait, c'est la **conséquence** de la façon dont le shell ouvre ce fichier — en écriture depuis le début, ce qui vide ce qu'il contenait.
+
+`>>` opère exactement la même redirection, mais ouvre le fichier en mode ajout : l'écriture reprend après la dernière ligne existante.
+
+Un seul mécanisme, donc, avec deux modes d'ouverture :
+
+| Écriture | Redirige la sortie | Ouvre le fichier |
+|---|---|---|
+| `>` | oui | depuis le début — le contenu existant est perdu |
+| `>>` | oui | à la fin — le contenu existant est conservé |
+
+Les deux **créent** le fichier s'il n'existe pas : la différence n'apparaît que s'il existe déjà.
 
 Il n'y a ni confirmation ni corbeille : un `>` à la place d'un `>>` détruit le contenu définitivement.
+
+C'est aussi ce qui explique `cat > .gitignore`. `cat` écrit toujours sur sa sortie, sans savoir où elle mène ; seule la destination de cette sortie a changé. Voir la fiche **Entrée et sortie standard**.
 
 Exemple de sa pratique, où l'ordre est essentiel :
 
@@ -103,7 +118,7 @@ Toute commande possède deux canaux : une **entrée** (ce qu'elle lit) et une **
 
 C'est pourquoi `wc -l` lancé seul semble figer le terminal : il attend que tu tapes quelque chose au clavier, puisque c'est là que son entrée est branchée. `Ctrl+D` signale la fin de la saisie ; il affiche alors `0`, n'ayant rien reçu.
 
-**Les quatre façons de rebrancher ces canaux :**
+**Les cinq façons de rebrancher ces canaux :**
 
 | Écriture | Ce qui est rebranché |
 |---|---|
@@ -111,8 +126,30 @@ C'est pourquoi `wc -l` lancé seul semble figer le terminal : il attend que tu t
 | `commande > fichier` | la **sortie** va dans un fichier |
 | `commande < fichier` | l'**entrée** vient d'un fichier |
 | `A \| B` | la **sortie de A** devient l'**entrée de B** |
+| `commande << 'FIN'` | l'**entrée** vient des lignes tapées à la suite |
 
 `>` et le pipe ne sont donc pas deux notions séparées : c'est la même idée, la redirection, appliquée à un canal différent.
+
+### Le heredoc
+
+`<< 'FIN'` fournit l'entrée d'une commande sans passer par un fichier : elle lira les lignes tapées ensuite, jusqu'à en rencontrer une contenant exactement le mot choisi comme délimiteur — `FIN` ici, `EOF` par convention répandue. Ce mécanisme s'appelle un **heredoc**.
+
+Les deux redirections se combinent, et c'est là que la nature de `cat` devient visible :
+
+```bash
+cat > .gitignore << 'FIN'
+node_modules/
+.env
+FIN
+```
+
+**Mot à mot :** *`cat`, lis les lignes que je vais taper jusqu'à celle qui contient `FIN`, et écris-les non pas à l'écran mais dans `.gitignore`.*
+
+`>` détourne la sortie, `<<` fournit l'entrée, et `cat` fait exactement son métier — écrire ce qu'il lit — sauf qu'« écrire » atterrit dans un fichier. Ni `>` ni `<<` n'appartiennent à `cat` : ce sont des opérateurs du **shell**, qui fonctionnent derrière n'importe quelle commande. `git status > sortie.txt` enregistre le statut au lieu de l'afficher.
+
+Le piège de `>` reste entier ici : il écrase le fichier existant sans prévenir. Voir la fiche **Écrire dans un fichier**.
+
+**Piège d'environnement, rencontré le 2026-08-18 :** collé dans le terminal, un heredoc échoue souvent — un espace se glisse devant le délimiteur de fin, `zsh` ne le reconnaît plus et reste bloqué sur l'invite `heredoc>`. `Ctrl+C` en sort. D'où le choix, dans ce module, d'une série de `echo` avec `>` puis `>>` plutôt qu'un heredoc.
 
 ## 1.6 Enchaîner des commandes
 
